@@ -37,14 +37,16 @@ def label_plots(
         row_direction: The direction that the rows in the field are pointing.
 
     Yields:
-        Each plot boundary polygon, along with the corresponding plot number.
+        Each plot boundary polygon, along with the corresponding plot number,
+        in the original order that the plot boundaries were provided in.
 
     """
     # Group the plots into rows.
     plot_boundaries = list(plot_boundaries)
     plot_centers = [p.centroid for p in plot_boundaries]
     boundaries_with_centers = [
-        (b, c) for b, c in zip(plot_boundaries, plot_centers)
+        (b, c, i)
+        for i, (b, c) in enumerate(zip(plot_boundaries, plot_centers))
     ]
     if row_direction == RowDirection.NORTH_TO_SOUTH:
         # Sort by x coordinate.
@@ -74,15 +76,16 @@ def label_plots(
             sorted(row, key=lambda p: p[1].x)
             for row in boundaries_with_centers_by_row
         ]
+    # Unbatch
     boundaries_with_centers_sorted = reduce(
         lambda x, y: x + y, boundaries_with_centers_sorted, []
     )
-    boundaries_sorted = [b for b, _ in boundaries_with_centers_sorted]
+    sorted_boundary_indices = [i for _, _, i in boundaries_with_centers_sorted]
 
     # Assign real plot numbers to them.
-    for i, boundary in enumerate(boundaries_sorted):
-        plot_num = field_config.get_plot_num_row_major(i)
-        if plot_num < 0:
-            # This is an empty or invalid plot.
-            continue
-        yield boundary, plot_num
+    boundary_plot_nums = {
+        i: field_config.get_plot_num_row_major(j)
+        for j, i in enumerate(sorted_boundary_indices)
+    }
+    for i, boundary in enumerate(plot_boundaries):
+        yield boundary, boundary_plot_nums[i]

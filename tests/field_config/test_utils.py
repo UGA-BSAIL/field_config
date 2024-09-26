@@ -49,22 +49,18 @@ def test_label_plots(
     # Assert.
     assert len(labeled) == len(example_1_plot_shapes)
 
-    # In this field, the north-western-most plot is 1393.
-    assert labeled[0][1] == 1393
-    # The south-eastern-most plot is 1729.
-    assert labeled[-1][1] == 1729
+    # Index by plot number.
+    labeled_centroids = {p: b.centroid for b, p in labeled}
 
-    plot1, _ = labeled[0]
-    plot2, _ = labeled[1]
     if row_direction == RowDirection.NORTH_TO_SOUTH:
-        # The plots should be enumerated north-to-south first.
-        assert plot1.centroid.y > plot2.centroid.y
-        assert (plot1.centroid.y - plot2.centroid.y) > (
-            plot2.centroid.x - plot1.centroid.x
+        # 1394 should be below 1393.
+        assert labeled_centroids[1394].y < labeled_centroids[1393].y
+        assert (labeled_centroids[1393].y - labeled_centroids[1394].y) > (
+            labeled_centroids[1394].x - labeled_centroids[1393].x
         )
-    else:
-        # The plots should be enumerated west-to-east first.
-        assert plot2.centroid.x > plot1.centroid.x
-        assert (plot2.centroid.x - plot1.centroid.x) > (
-            plot1.centroid.y - plot2.centroid.y
+    if row_direction == RowDirection.WEST_TO_EAST:
+        # 1394 should be right of 1393.
+        assert labeled_centroids[1394].x > labeled_centroids[1393].x
+        assert (labeled_centroids[1394].x - labeled_centroids[1393].x) > (
+            labeled_centroids[1393].y - labeled_centroids[1394].y
         )

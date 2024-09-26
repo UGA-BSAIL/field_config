@@ -6,7 +6,7 @@ from typing import Iterable, Dict, Any
 from functools import singledispatch
 from tabulate import tabulate
 
-from src.field_config.field_row import FieldRow
+from .field_row import FieldRow
 
 
 class FieldConfig:

@@ -4,6 +4,7 @@ Represents the configuration of a field.
 
 from typing import Iterable, Dict, Any
 from functools import singledispatch
+from tabulate import tabulate
 
 from src.field_config.field_row import FieldRow
 
@@ -127,3 +128,17 @@ class FieldConfig:
 
         """
         return sum(len(row) for row in self.__rows)
+
+    def draw(self) -> None:
+        """
+        Prints a visual representation of the field.
+
+        """
+        table = []
+        for row_i, row in enumerate(self.__rows):
+            table_row = []
+            for plot_i in range(len(row)):
+                table_row.append(self.get_plot_num(row_i, plot_i))
+            table.append(table_row)
+
+        print(tabulate(table, tablefmt="simple_grid"))
